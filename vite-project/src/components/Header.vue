@@ -31,32 +31,58 @@
             />
           </svg>
         </button>
+
+        <!-- User actions -->
+        <div v-if="isLoggedIn">
+          <span class="text-white mr-4">Welcome, {{ username }}</span>
+          <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+        </div>
+        <div v-else>
+          <router-link to="/login">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
+          </router-link>
+        </div>
       </div>
     </nav>
   </header>
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+
 export default {
   name: "Header",
+  setup() {
+    const router = useRouter();
+    const isLoggedIn = ref(!!localStorage.getItem('jwt'));
+    const username = ref(localStorage.getItem('username') || '');
 
-  methods: {
-    /**
-     * Handle the click event on the "SwiftCart" button.
-     * 
-     * This method saves the current sorting and filter states to localStorage
-     * before navigating to the home page.
-     */
-    handleClick() {
+    const handleClick = () => {
       const sorting = localStorage.getItem('sorting') || 'default';
       const filterItem = localStorage.getItem('filterItem') || 'All categories';
 
       localStorage.setItem('previousPageState', JSON.stringify({ sorting, filterItem }));
-    },
+    };
+
+    const logout = () => {
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('username');
+      isLoggedIn.value = false;
+      username.value = '';
+      router.push('/');
+    };
+
+    return {
+      isLoggedIn,
+      username,
+      handleClick,
+      logout,
+    };
   },
 };
 </script>
 
 <style scoped>
-/* You can add any scoped styles for this component here */
+/* Add any scoped styles for this component here */
 </style>
