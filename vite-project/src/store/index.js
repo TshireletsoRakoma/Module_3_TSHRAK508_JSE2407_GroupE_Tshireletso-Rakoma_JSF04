@@ -6,37 +6,82 @@ const store = createStore({
       searchTerm: '',
       sorting: 'default',
       filterItem: 'All categories',
+      isLoggedIn: !!localStorage.getItem('jwt'),
+      username: localStorage.getItem('username') || '',
+      cart: JSON.parse(localStorage.getItem('cart')) || {}, // Ensure cart state is loaded
     };
   },
   mutations: {
-    setSearchTerm(state, searchTerm) {
-      state.searchTerm = searchTerm;
+    // Add product to cart
+    addToCart(state, { productId, productPrice, quantity = 1 }) {
+      if (!state.cart[state.username]) {
+        state.cart[state.username] = {};
+      }
+      if (state.cart[state.username][productId]) {
+        state.cart[state.username][productId].quantity += quantity;
+      } else {
+        state.cart[state.username][productId] = { quantity, productPrice };
+      }
+      localStorage.setItem('cart', JSON.stringify(state.cart));
     },
-    setSorting(state, sorting) {
-      state.sorting = sorting;
+    // Update quantity of an existing cart item
+    updateCartItem(state, { productId, quantity }) {
+      if (state.cart[state.username]) {
+        if (quantity > 0) {
+          state.cart[state.username][productId].quantity = quantity;
+        } else {
+          delete state.cart[state.username][productId];
+        }
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+      }
     },
-    setFilterItem(state, filterItem) {
-      state.filterItem = filterItem;
+    // Clear the cart
+    clearCart(state) {
+      if (state.cart[state.username]) {
+        delete state.cart[state.username];
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+      }
     },
   },
   actions: {
-    updateSearchTerm({ commit }, searchTerm) {
-      commit('setSearchTerm', searchTerm);
+    // Dispatch to add product to cart
+    addToCart({ commit }, payload) {
+      commit('addToCart', payload);
     },
-    updateSorting({ commit }, sorting) {
-      commit('setSorting', sorting);
+    // Dispatch to update cart item quantity
+    updateCartItem({ commit }, payload) {
+      commit('updateCartItem', payload);
     },
-    updateFilterItem({ commit }, filterItem) {
-      commit('setFilterItem', filterItem);
+    // Dispatch to clear the cart
+    clearCart({ commit }) {
+      commit('clearCart');
     },
   },
   getters: {
-    searchTerm: (state) => state.searchTerm,
-    sorting: (state) => state.sorting,
-    filterItem: (state) => state.filterItem,
+    // Count total items in cart
+    cartItemCount: (state) => {
+      if (!state.isLoggedIn || !state.cart[state.username]) {
+        return 0;
+      }
+      return Object.values(state.cart[state.username]).reduce((acc, item) => acc + item.quantity, 0);
+    },
+    // Calculate total cost of items in cart
+    cartTotalCost: (state) => {
+      if (!state.isLoggedIn || !state.cart[state.username]) {
+        return 0;
+      }
+      return Object.values(state.cart[state.username]).reduce((total, item) => {
+        return total + item.quantity * item.productPrice;
+      }, 0).toFixed(2);
+    },
+    // Get the entire cart for current user
+    cartContents: (state) => {
+      if (!state.isLoggedIn || !state.cart[state.username]) {
+        return {};
+      }
+      return state.cart[state.username];
+    },
   },
-
-  
 });
 
 export default store;

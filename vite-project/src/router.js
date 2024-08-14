@@ -1,12 +1,15 @@
-import { createRouter, createWebHistory } from "vue-router";
-import ProductList from "./components/ProductList.vue";
-import ProductDetails from "./components/ProductDetail.vue";
-import Login from "./components/Login.vue";
+// src/router/index.js
+import { createRouter, createWebHistory } from 'vue-router';
+import ProductList from './components/ProductList.vue';
+import ProductDetails from './components/ProductDetail.vue';
+import Login from './components/Login.vue';
+import Cart from '../src/pages/Cart.vue'
 
 const routes = [
-  { path: "/", name: "ProductList", component: ProductList },
-  { path: "/product/:id", name: "ProductDetails", component: ProductDetails },
-  { path: "/login", name: "Login", component: Login },
+  { path: '/', name: 'ProductList', component: ProductList },
+  { path: '/product/:id', name: 'ProductDetails', component: ProductDetails },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/cart', name: 'Cart', component: Cart},
 ];
 
 const router = createRouter({
@@ -15,9 +18,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem("jwt");
-  if (to.name !== "Login" && !isAuthenticated) {
-    next({ name: "Login", query: { redirect: to.fullPath } });
+  const isAuthenticated = !!localStorage.getItem('jwt');
+  if (to.name !== 'Login' && !isAuthenticated) {
+    next({ name: 'Login', query: { redirect: to.fullPath } });
   } else {
     next();
   }

@@ -15,6 +15,12 @@
       <p class="product-category">{{ product.category }}</p>
       <p class="product-rating">Rating: {{ product.rating.rate }}</p>
       <p class="product-reviews">Number of Reviews: {{ product.rating.count }}</p>
+      
+      <!-- Add to Cart Button -->
+      <button class="add-to-cart-btn" @click="addToCart">
+        <img src="../assets/Add2.svg" alt="Add to Cart" class="cart-icon" />
+        Add to Cart
+      </button>
     </div>
     <router-link to="/" class="back-link">Back to products</router-link>
   </main>
@@ -23,6 +29,7 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from 'vuex'; // Import Vuex store
 
 /**
  * ProductDetail component displays detailed information about a selected product.
@@ -40,6 +47,7 @@ export default {
   name: "ProductDetail",
   setup() {
     const route = useRoute();
+    const store = useStore(); // Access the Vuex store
     const id = route.params.id; // Get the product ID from the route parameters
 
     const product = ref(null);
@@ -69,6 +77,17 @@ export default {
       }
     };
 
+    /**
+     * Handles adding the product to the cart using the Vuex store.
+     */
+    const addToCart = () => {
+      store.dispatch('addToCart', {
+        productId: product.value.id,
+        productPrice: product.value.price,
+      });
+      console.log(`Product ${product.value.title} added to cart!`);
+    };
+
     onMounted(() => {
       fetchProduct(id);
     });
@@ -77,6 +96,7 @@ export default {
       product,
       loading,
       error,
+      addToCart,
     };
   },
 };
@@ -95,6 +115,15 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow */
   text-align: center;
   position: relative; /* Ensure this container doesn't overlap the fixed button */
+}
+
+.product-detail {
+  margin: 20px; /* Add margin around the product detail */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #f9f9f9;
 }
 
 .product-detail img {
@@ -125,6 +154,31 @@ export default {
 .product-reviews {
   color: #777;
   margin-top: 5px;
+}
+
+.add-to-cart-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #218838;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
 }
 
 .back-link {

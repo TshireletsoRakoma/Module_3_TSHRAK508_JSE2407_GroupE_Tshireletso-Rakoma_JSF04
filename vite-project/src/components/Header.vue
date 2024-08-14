@@ -33,14 +33,27 @@
         </button>
 
         <!-- User actions -->
-        <div v-if="isLoggedIn">
-          <span class="text-white mr-4">Welcome, {{ username }}</span>
+        <div v-if="isLoggedIn" class="flex items-center space-x-4">
+          <transition name="fade-slide">
+            <span
+              v-if="showWelcomeMessage"
+              class="welcome-message text-white"
+              :style="{ animationPlayState: animationPaused ? 'paused' : 'running' }"
+            >
+              Welcome, {{ username }}
+            </span>
+          </transition>
+          <span class="text-white">Items in Cart: {{ cartItemCount }}</span>
           <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+          <!-- CartButton component -->
+          <CartButton />
         </div>
-        <div v-else>
+        <div v-else class="flex items-center space-x-4">
           <router-link to="/login">
             <button class="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
           </router-link>
+          <!-- CartButton component next to Login button -->
+          <CartButton />
         </div>
       </div>
     </nav>
@@ -48,34 +61,69 @@
 </template>
 
 <script>
-import { useRouter } from "vue-router";
-import { ref, computed } from "vue";
+import { useRouter } from 'vue-router';
+import { computed, ref, watch, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import CartButton from './CartButton.vue'; // Import CartButton component
 
 export default {
-  name: "Header",
+  name: 'Header',
+  components: {
+    CartButton, // Register CartButton component
+  },
   setup() {
     const router = useRouter();
-    const isLoggedIn = ref(!!localStorage.getItem('jwt'));
-    const username = ref(localStorage.getItem('username') || '');
+    const store = useStore();
+
+    const isLoggedIn = computed(() => store.getters.isLoggedIn);
+    const username = computed(() => store.getters.username);
+    const cartItemCount = computed(() => store.getters.cartItemCount);
+    const showWelcomeMessage = ref(false);
+    const animationPaused = ref(true);
 
     const handleClick = () => {
       const sorting = localStorage.getItem('sorting') || 'default';
       const filterItem = localStorage.getItem('filterItem') || 'All categories';
-
-      localStorage.setItem('previousPageState', JSON.stringify({ sorting, filterItem }));
+      localStorage.setItem(
+        'previousPageState',
+        JSON.stringify({ sorting, filterItem })
+      );
     };
 
     const logout = () => {
-      localStorage.removeItem('jwt');
-      localStorage.removeItem('username');
-      isLoggedIn.value = false;
-      username.value = '';
-      router.push('/');
+      store.dispatch('logout');
+      showWelcomeMessage.value = false;
+      router.push('/login');
     };
+
+    const startAnimation = () => {
+      showWelcomeMessage.value = true;
+      animationPaused.value = false;
+      setTimeout(() => {
+        showWelcomeMessage.value = false;
+      }, 3000);
+    };
+
+    onMounted(() => {
+      if (isLoggedIn.value) {
+        startAnimation();
+      }
+    });
+
+    watch(() => store.getters.isLoggedIn, (newVal) => {
+      if (newVal) {
+        startAnimation();
+      } else {
+        showWelcomeMessage.value = false;
+      }
+    });
 
     return {
       isLoggedIn,
       username,
+      cartItemCount,
+      showWelcomeMessage,
+      animationPaused,
       handleClick,
       logout,
     };
@@ -84,5 +132,36 @@ export default {
 </script>
 
 <style scoped>
-/* Add any scoped styles for this component here */
+.welcome-message {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+}
+
+.welcome-message {
+  animation: slideOut 3s forwards;
+}
 </style>

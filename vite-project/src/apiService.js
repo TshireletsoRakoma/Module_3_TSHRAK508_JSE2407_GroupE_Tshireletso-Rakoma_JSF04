@@ -8,16 +8,12 @@ const api = axios.create({
   },
 });
 
-export const login = async (username, password) => {
-  try {
-    const response = await api.post('/auth/login', {
-      username,
-      password,
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : error.message;
+export const fakeLogin = async (username, password) => {
+  // Simulate authentication logic
+  if (username === 'Tshire' && password === '1234') {
+    return { token: 'fake-jwt-token' }; // Simulated token
   }
+  throw new Error('Invalid username or password');
 };
 
 // Add other API methods here if needed
