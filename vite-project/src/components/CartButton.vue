@@ -2,7 +2,7 @@
   <button class="cart-button flex items-center space-x-2">
     <router-link to="/cart">
     <img src="../assets/Basket.svg" alt="Cart" class="w-6 h-6"/>
-    <span class="text-white">Cart</span>
+    <span class="text-white"></span>
     </router-link>
   </button>
 </template>
