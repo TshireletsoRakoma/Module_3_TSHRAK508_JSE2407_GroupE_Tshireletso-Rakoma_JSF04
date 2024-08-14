@@ -35,6 +35,13 @@ const store = createStore({
         localStorage.setItem('cart', JSON.stringify(state.cart));
       }
     },
+    // Remove an item from the cart
+    removeFromCart(state, productId) {
+      if (state.cart[state.username] && state.cart[state.username][productId]) {
+        delete state.cart[state.username][productId];
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+      }
+    },
     // Clear the cart
     clearCart(state) {
       if (state.cart[state.username]) {
@@ -51,6 +58,10 @@ const store = createStore({
     // Dispatch to update cart item quantity
     updateCartItem({ commit }, payload) {
       commit('updateCartItem', payload);
+    },
+    // Dispatch to remove a product from cart
+    removeFromCart({ commit }, productId) {
+      commit('removeFromCart', productId);
     },
     // Dispatch to clear the cart
     clearCart({ commit }) {
