@@ -17,9 +17,9 @@
       <p class="product-reviews">Number of Reviews: {{ product.rating.count }}</p>
       
       <!-- Add to Cart Button -->
-      <button class="add-to-cart-btn" @click="addToCart">
+      <button class="add-to-cart-btn" @click="handleAddToCart">
         <img src="../assets/Add2.svg" alt="Add to Cart" class="cart-icon" />
-        Add to Cart
+        {{ buttonText }}
       </button>
     </div>
     <router-link to="/" class="back-link">Back to products</router-link>
@@ -31,18 +31,6 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from 'vuex'; // Import Vuex store
 
-/**
- * ProductDetail component displays detailed information about a selected product.
- *
- * @component
- * @example
- * <ProductDetail />
- *
- * @returns {Object} - Contains the reactive properties and methods for the component.
- * @returns {Ref<Object|null>} product - The detailed information of the product.
- * @returns {Ref<boolean>} loading - A boolean indicating whether the product data is loading.
- * @returns {Ref<string|null>} error - The error message if the data fetching fails.
- */
 export default {
   name: "ProductDetail",
   setup() {
@@ -53,6 +41,7 @@ export default {
     const product = ref(null);
     const loading = ref(true);
     const error = ref(null);
+    const buttonText = ref('Add to Cart'); // Reactive state for button text
 
     /**
      * Fetches product details from the API.
@@ -79,12 +68,20 @@ export default {
 
     /**
      * Handles adding the product to the cart using the Vuex store.
+     * Changes button text to "Added" and reverts back after 0.2 seconds.
      */
-    const addToCart = () => {
+    const handleAddToCart = () => {
       store.dispatch('addToCart', {
         productId: product.value.id,
         productPrice: product.value.price,
       });
+      
+      // Change button text to "Added" and revert after 0.2 seconds
+      buttonText.value = 'Added';
+      setTimeout(() => {
+        buttonText.value = 'Add to Cart';
+      }, 900);
+      
       console.log(`Product ${product.value.title} added to cart!`);
     };
 
@@ -96,7 +93,8 @@ export default {
       product,
       loading,
       error,
-      addToCart,
+      buttonText,
+      handleAddToCart,
     };
   },
 };
