@@ -47,13 +47,17 @@
           <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
           <!-- CartButton component -->
           <CartButton />
+          <!-- WishListButton component -->
+          <WishListButton />
         </div>
         <div v-else class="flex items-center space-x-4">
           <router-link to="/login">
-            <button class="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
+            <button class="bg-blue-500 text-white px-4 py-2 rounded">Logout</button>
           </router-link>
           <!-- CartButton component next to Login button -->
           <CartButton />
+          <!-- WishListButton component -->
+          <WishListButton />
         </div>
       </div>
     </nav>
@@ -64,12 +68,17 @@
 import { useRouter } from 'vue-router';
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import CartButton from './CartButton.vue'; // Import CartButton component
+import WishListButton from './WishList2.vue'; // Fix the casing of the file name
+import CartButton from './CartButton.vue';
+
+
+
 
 export default {
   name: 'Header',
   components: {
-    CartButton, // Register CartButton component
+    CartButton,
+    WishListButton // Register WishListButton component
   },
   setup() {
     const router = useRouter();
