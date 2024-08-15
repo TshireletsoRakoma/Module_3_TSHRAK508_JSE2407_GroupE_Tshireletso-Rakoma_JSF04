@@ -12,6 +12,11 @@ const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/cart', name: 'Cart', component: Cart},
   { path: '/wishlist', name: 'WishList', component: WishList},
+  {
+  path: '/wishlist',
+  component: () => import('./components/WishList2.vue')
+}
+
 
 ];
 

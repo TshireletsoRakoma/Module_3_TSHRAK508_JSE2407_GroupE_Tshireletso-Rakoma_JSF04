@@ -23,7 +23,8 @@
           View Details
         </button>
         <button
-          @click="toggleFavorite"
+        type="button"
+          @click="()=>toggleFavorite(product)"
           class="favorite-button"
         >
           <svg
@@ -44,6 +45,7 @@
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 /**
  * ProductCard component displays individual product details in a card format.
@@ -70,6 +72,7 @@ export default {
   setup(props) {
     const router = useRouter();
     const isFavorite = ref(false);
+    const store = useStore(); 
 
     /**
      * Navigates to the detailed view of the product.
@@ -81,8 +84,19 @@ export default {
     /**
      * Toggles the favorite state of the product.
      */
-    const toggleFavorite = () => {
+    const toggleFavorite = (product) => {
       isFavorite.value = !isFavorite.value;
+      handleAddToWishList(product)
+    };
+    const handleAddToWishList = (product) => {
+      console.log(product);
+      store.dispatch('addToWishlist', {
+        productId: product.id,
+        productPrice: product.price,
+        productQuantity: 1,
+        productTitle: product.title,
+        productImage: product.image,
+      });
     };
 
     return {
@@ -91,7 +105,7 @@ export default {
       isFavorite,
     };
   },
-};
+}
 </script>
 
 <style scoped>
