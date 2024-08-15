@@ -15,18 +15,35 @@
       <p class="product-category text-gray-500 text-sm mb-2">
         {{ product.category }}
       </p>
-      <button
-        @click="()=>navigateToProduct(product)"
-        class="view-details-button bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        View Details
-      </button>
+      <div class="flex items-center justify-between">
+        <button
+          @click="navigateToProduct(product)"
+          class="view-details-button bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          View Details
+        </button>
+        <button
+          @click="toggleFavorite"
+          class="favorite-button"
+        >
+          <svg
+            :class="{ 'text-red-500': isFavorite }"
+            class="w-6 h-6"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 /**
  * ProductCard component displays individual product details in a card format.
@@ -43,7 +60,7 @@ import { useRouter } from "vue-router";
  * @prop {string} product.category - The category of the product.
  */
 export default {
-  name: "ProductCard",
+  name: 'ProductCard',
   props: {
     product: {
       type: Object,
@@ -52,17 +69,26 @@ export default {
   },
   setup(props) {
     const router = useRouter();
+    const isFavorite = ref(false);
 
     /**
      * Navigates to the detailed view of the product.
      */
     const navigateToProduct = (product) => {
-      console.log(product)
       router.push(`/product/${props.product.id}`);
+    };
+
+    /**
+     * Toggles the favorite state of the product.
+     */
+    const toggleFavorite = () => {
+      isFavorite.value = !isFavorite.value;
     };
 
     return {
       navigateToProduct,
+      toggleFavorite,
+      isFavorite,
     };
   },
 };
@@ -127,6 +153,17 @@ export default {
 
 .view-details-button:hover {
   background-color: #0056b3;
+}
+
+.favorite-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.favorite-button svg {
+  transition: color 0.2s;
 }
 
 .grid-container {
