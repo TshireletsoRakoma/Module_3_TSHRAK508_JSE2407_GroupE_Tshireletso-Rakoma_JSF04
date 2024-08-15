@@ -3,7 +3,7 @@
     <nav class="bg-gray-500 border-gray-200">
       <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <!-- Link to the home page with state preservation -->
-        <router-link to="/" @click.native="handleClick">
+<router-link to="/" @click="handleClick">
           <button class="flex items-center space-x-3 rtl:space-x-reverse">
             <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">SwiftCart</span>
           </button>
