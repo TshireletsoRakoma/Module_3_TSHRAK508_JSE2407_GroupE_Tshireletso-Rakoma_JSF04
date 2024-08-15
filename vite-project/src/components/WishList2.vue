@@ -36,19 +36,16 @@ export default {
   methods: {
     loadWishlist() {
       const storedWishlist = localStorage.getItem('wishlist');
-      console.log('Stored Wishlist:', storedWishlist); // Log raw data
       this.wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      console.log('Parsed Wishlist:', this.wishlist); // Log parsed data
     },
     formatPrice(price) {
-      // Ensure price is a valid number
       return isNaN(price) ? '0.00' : Number(price).toFixed(2);
     },
     removeFromWishlist(index) {
-      // Remove item from the local array
       this.wishlist.splice(index, 1);
-      // Update localStorage
       localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
+      // Notify other components about the change
+      window.dispatchEvent(new Event('storage'));
     }
   }
 }
