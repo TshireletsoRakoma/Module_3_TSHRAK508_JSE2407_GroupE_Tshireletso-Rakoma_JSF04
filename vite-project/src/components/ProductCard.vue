@@ -16,7 +16,7 @@
         {{ product.category }}
       </p>
       <button
-        @click="navigateToProduct"
+        @click="()=>navigateToProduct(product)"
         class="view-details-button bg-blue-500 text-white px-4 py-2 rounded"
       >
         View Details
@@ -56,7 +56,8 @@ export default {
     /**
      * Navigates to the detailed view of the product.
      */
-    const navigateToProduct = () => {
+    const navigateToProduct = (product) => {
+      console.log(product)
       router.push(`/product/${props.product.id}`);
     };
 

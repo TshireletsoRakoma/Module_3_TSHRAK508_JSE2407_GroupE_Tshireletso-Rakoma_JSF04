@@ -74,6 +74,9 @@ export default {
       store.dispatch('addToCart', {
         productId: product.value.id,
         productPrice: product.value.price,
+        productQuantity: 1,
+        productTitle: product.value.title,
+        productImage: product.value.image,
       });
       
       // Change button text to "Added" and revert after 0.2 seconds

@@ -13,14 +13,14 @@ const store = createStore({
   },
   mutations: {
     // Add product to cart
-    addToCart(state, { productId, productPrice, quantity = 1 }) {
+    addToCart(state, { productId, productPrice, quantity = 1 ,productTitle,productImage}) {
       if (!state.cart[state.username]) {
         state.cart[state.username] = {};
       }
       if (state.cart[state.username][productId]) {
         state.cart[state.username][productId].quantity += quantity;
       } else {
-        state.cart[state.username][productId] = { quantity, productPrice };
+        state.cart[state.username][productId] = { quantity, productPrice ,productTitle,productImage};
       }
       localStorage.setItem('cart', JSON.stringify(state.cart));
     },

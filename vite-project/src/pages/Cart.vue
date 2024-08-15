@@ -7,11 +7,13 @@
       <div v-else class="cart-items">
         <div v-for="(item, productId) in cartContents" :key="productId" class="cart-item">
           <!-- Display the product image -->
-          <img :src="getProductImage(productId)" :alt="getProductName(productId)" class="product-image"/>
+          <img :src="getProductImage(productId,item)" :alt="getProductName(productId)" class="product-image"/>
+          
           <div class="item-details">
-            <p>{{ getProductName(productId) }}</p>
+            
             <p>Price: ${{ item.productPrice }}</p>
             <p>Quantity: {{ item.quantity }}</p>
+            <p>{{ item.productTitle }}</p>
             <p>Total: ${{ (item.productPrice * item.quantity).toFixed(2) }}</p>
           </div>
           <!-- Delete Item Button -->
@@ -45,9 +47,10 @@
         // Fetch or map productId to product name, possibly using a separate Vuex action or API call.
         return `Product ${productId}`; // Placeholder
       },
-      getProductImage(productId) {
+      getProductImage(productId,item) {
+        console.log(item.productImage)
         // Placeholder function to fetch the product image URL
-        return `https://fakestoreapi.com/img/${productId}.jpg`; // Placeholder URL format for images
+        return item.productImage; // Placeholder URL format for images
       },
       removeItemFromCart(productId) {
         this.removeFromCart(productId);
