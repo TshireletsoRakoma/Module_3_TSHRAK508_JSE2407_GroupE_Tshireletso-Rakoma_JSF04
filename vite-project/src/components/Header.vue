@@ -3,7 +3,7 @@
     <nav class="bg-gray-500 border-gray-200">
       <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <!-- Link to the home page with state preservation -->
-<router-link to="/" @click="handleClick">
+        <router-link to="/" @click="handleClick">
           <button class="flex items-center space-x-3 rtl:space-x-reverse">
             <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">SwiftCart</span>
           </button>
@@ -52,7 +52,7 @@
         </div>
         <div v-else class="flex items-center space-x-4">
           <router-link to="/login">
-            <button class="bg-blue-500 text-white px-4 py-2 rounded">Logout</button>
+            <button class="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
           </router-link>
           <!-- CartButton component next to Login button -->
           <CartButton />
@@ -68,11 +68,8 @@
 import { useRouter } from 'vue-router';
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import WishListButton from './WishList2.vue'; // Fix the casing of the file name
+import WishListButton from './WishListButton.vue'; // Corrected file name
 import CartButton from './CartButton.vue';
-
-
-
 
 export default {
   name: 'Header',
