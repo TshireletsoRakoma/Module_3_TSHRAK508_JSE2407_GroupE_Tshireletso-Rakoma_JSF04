@@ -5,6 +5,7 @@ import ProductDetails from './components/ProductDetail.vue';
 import Login from './components/Login.vue';
 import Cart from '../src/pages/Cart.vue';
 import WishList from './components/WishList2.vue';
+import StarRating from './components/StarRating.vue';
 
 const routes = [
   { path: '/', name: 'ProductList', component: ProductList },
@@ -15,8 +16,9 @@ const routes = [
   {
   path: '/wishlist',
   component: () => import('./components/WishList2.vue')
-}
+},
 
+{ path: '/StarRating', name: 'StarRating', component: StarRating}
 
 ];
 

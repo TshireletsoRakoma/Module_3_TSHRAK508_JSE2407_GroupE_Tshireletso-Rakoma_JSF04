@@ -8,8 +8,10 @@ const store = createStore({
       filterItem: 'All categories',
       isLoggedIn: !!localStorage.getItem('jwt'),
       username: localStorage.getItem('username') || '',
-      cart: JSON.parse(localStorage.getItem('cart')) || {}, 
-      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [], 
+      cart: JSON.parse(localStorage.getItem('cart')) || {},
+      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
+      reviews: JSON.parse(localStorage.getItem('reviews')) || [],
+      ratings: JSON.parse(localStorage.getItem('ratings')) || {}, // Store ratings by productId
     };
   },
   mutations: {
@@ -54,6 +56,40 @@ const store = createStore({
       state.wishlist = state.wishlist.filter(item => item.id !== productId);
       localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
     },
+    addReview(state, review) {
+      state.reviews.push(review);
+      localStorage.setItem('reviews', JSON.stringify(state.reviews));
+    },
+    updateReview(state, updatedReview) {
+      const index = state.reviews.findIndex(review => review.id === updatedReview.id);
+      if (index !== -1) {
+        state.reviews[index] = updatedReview;
+        localStorage.setItem('reviews', JSON.stringify(state.reviews));
+      }
+    },
+    deleteReview(state, reviewId) {
+      state.reviews = state.reviews.filter(review => review.id !== reviewId);
+      localStorage.setItem('reviews', JSON.stringify(state.reviews));
+    },
+    addRating(state, { productId, rating }) {
+      if (!state.ratings[productId]) {
+        state.ratings[productId] = [];
+      }
+      state.ratings[productId].push(rating);
+      localStorage.setItem('ratings', JSON.stringify(state.ratings));
+    },
+    updateRating(state, { productId, index, rating }) {
+      if (state.ratings[productId] && state.ratings[productId][index] !== undefined) {
+        state.ratings[productId][index] = rating;
+        localStorage.setItem('ratings', JSON.stringify(state.ratings));
+      }
+    },
+    deleteRating(state, { productId, index }) {
+      if (state.ratings[productId] && state.ratings[productId][index] !== undefined) {
+        state.ratings[productId].splice(index, 1);
+        localStorage.setItem('ratings', JSON.stringify(state.ratings));
+      }
+    },
   },
   actions: {
     addToCart({ commit }, payload) {
@@ -73,6 +109,24 @@ const store = createStore({
     },
     removeFromWishlist({ commit }, productId) {
       commit('removeFromWishlist', productId);
+    },
+    addReview({ commit }, review) {
+      commit('addReview', review);
+    },
+    updateReview({ commit }, updatedReview) {
+      commit('updateReview', updatedReview);
+    },
+    deleteReview({ commit }, reviewId) {
+      commit('deleteReview', reviewId);
+    },
+    addRating({ commit }, payload) {
+      commit('addRating', payload);
+    },
+    updateRating({ commit }, payload) {
+      commit('updateRating', payload);
+    },
+    deleteRating({ commit }, payload) {
+      commit('deleteRating', payload);
     },
   },
   getters: {
@@ -96,11 +150,17 @@ const store = createStore({
       }
       return state.cart[state.username];
     },
-    wishlistItems: (state) => {
-      return state.wishlist;
-    },
-    wishlistCount: (state) => {
+    wishlistItemCount: (state) => {
       return state.wishlist.length;
+    },
+    reviewsForProduct: (state) => (productId) => {
+      return state.reviews.filter(review => review.productId === productId);
+    },
+    averageRatingForProduct: (state) => (productId) => {
+      const ratings = state.ratings[productId] || [];
+      if (ratings.length === 0) return 0;
+      const sum = ratings.reduce((acc, rating) => acc + rating, 0);
+      return (sum / ratings.length).toFixed(1);
     },
   },
 });
