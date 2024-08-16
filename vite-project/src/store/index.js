@@ -8,12 +8,11 @@ const store = createStore({
       filterItem: 'All categories',
       isLoggedIn: !!localStorage.getItem('jwt'),
       username: localStorage.getItem('username') || '',
-      cart: JSON.parse(localStorage.getItem('cart')) || {}, // Ensure cart state is loaded
-      wishlist: [], // Initialize wishlist state
+      cart: JSON.parse(localStorage.getItem('cart')) || {}, 
+      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [], 
     };
   },
   mutations: {
-    // Cart mutations
     addToCart(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
       if (!state.cart[state.username]) {
         state.cart[state.username] = {};
@@ -47,18 +46,16 @@ const store = createStore({
         localStorage.setItem('cart', JSON.stringify(state.cart));
       }
     },
-
-    // Wishlist mutations
     addToWishlist(state, product) {
       state.wishlist.push(product);
       localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
     },
     removeFromWishlist(state, productId) {
       state.wishlist = state.wishlist.filter(item => item.id !== productId);
+      localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
     },
   },
   actions: {
-    // Cart actions
     addToCart({ commit }, payload) {
       commit('addToCart', payload);
     },
@@ -71,8 +68,6 @@ const store = createStore({
     clearCart({ commit }) {
       commit('clearCart');
     },
-
-    // Wishlist actions
     addToWishlist({ commit }, product) {
       commit('addToWishlist', product);
     },
@@ -81,7 +76,6 @@ const store = createStore({
     },
   },
   getters: {
-    // Cart getters
     cartItemCount: (state) => {
       if (!state.isLoggedIn || !state.cart[state.username]) {
         return 0;
@@ -102,8 +96,6 @@ const store = createStore({
       }
       return state.cart[state.username];
     },
-
-    // Optional wishlist getters (if needed in the future)
     wishlistItems: (state) => {
       return state.wishlist;
     },

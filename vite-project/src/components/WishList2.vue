@@ -6,7 +6,7 @@
     </div>
     <div v-else class="wishlist-items">
       <div v-for="(item, index) in wishlist" :key="index" class="wishlist-item">
-        <img :src="item.image" :alt="item.title" class="product-image"/>
+        <img :src="item.productImage" :alt="item.title" class="product-image"/>
         <div class="item-details">
           <p>{{ item.productTitle }}</p>
           <p>Price: ${{ formatPrice(item.productPrice) }}</p>

@@ -2,40 +2,21 @@
   <button class="wishlist-button flex items-center space-x-2">
     <router-link to="/wishlist" class="relative flex items-center">
       <img src="../assets/wish.svg" alt="Wishlist" class="w-6 h-6"/>
-      <span v-if="wishlistCount > 0" class="wishlist-count">{{ wishlistCount }}</span>
+      <span v-if="wishlistCount > 0" class="wishlist-count absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1">
+        {{ wishlistCount }}
+      </span>
     </router-link>
   </button>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'WishListButton',
-  data() {
-    return {
-      wishlistCount: 0
-    };
+  computed: {
+    ...mapGetters(['wishlistCount']),
   },
-  mounted() {
-    this.updateWishlistCount();
-    window.addEventListener('storage', this.handleStorageChange);
-  },
-  beforeDestroy() {
-    window.removeEventListener('storage', this.handleStorageChange);
-  },
-  methods: {
-    updateWishlistCount() {
-      // Fetch the wishlist from local storage
-      const storedWishlist = localStorage.getItem('wishlist');
-      const wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      this.wishlistCount = wishlist.length;
-    },
-    handleStorageChange(event) {
-      // Update count if the wishlist key changes in local storage
-      if (event.key === 'wishlist') {
-        this.updateWishlistCount();
-      }
-    }
-  }
 };
 </script>
 
