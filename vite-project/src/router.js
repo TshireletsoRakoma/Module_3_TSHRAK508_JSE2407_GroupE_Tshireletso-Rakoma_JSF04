@@ -3,23 +3,20 @@ import { createRouter, createWebHistory } from 'vue-router';
 import ProductList from './components/ProductList.vue';
 import ProductDetails from './components/ProductDetail.vue';
 import Login from './components/Login.vue';
-import Cart from '../src/pages/Cart.vue';
+import Cart from './pages/Cart.vue';
 import WishList from './components/WishList2.vue';
 import StarRating from './components/StarRating.vue';
+import Reviews from './components/Reviews.vue';
 
 const routes = [
   { path: '/', name: 'ProductList', component: ProductList },
   { path: '/product/:id', name: 'ProductDetails', component: ProductDetails },
   { path: '/login', name: 'Login', component: Login },
-  { path: '/cart', name: 'Cart', component: Cart},
-  { path: '/wishlist', name: 'WishList', component: WishList},
-  {
-  path: '/wishlist',
-  component: () => import('./components/WishList2.vue')
-},
-
-{ path: '/StarRating', name: 'StarRating', component: StarRating}
-
+  { path: '/cart', name: 'Cart', component: Cart },
+  { path: '/wishlist', name: 'WishList', component: WishList },
+  { path: '/star-rating', name: 'StarRating', component: StarRating },
+  { path: '/reviews', name: 'Reviews', component: Reviews },
+  { path: '/reviews/:id', name: 'ReviewDetails', component: Reviews },
 ];
 
 const router = createRouter({

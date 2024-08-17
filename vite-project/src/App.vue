@@ -8,6 +8,8 @@ const store = useStore();
 
 // Computed property to get the cart item count
 const cartItemCount = computed(() => store.getters.cartItemCount);
+
+
 </script>
 
 <template>

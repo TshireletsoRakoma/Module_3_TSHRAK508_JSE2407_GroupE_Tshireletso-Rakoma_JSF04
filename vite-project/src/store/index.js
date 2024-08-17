@@ -10,11 +10,32 @@ const store = createStore({
       username: localStorage.getItem('username') || '',
       cart: JSON.parse(localStorage.getItem('cart')) || {},
       wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
-      reviews: JSON.parse(localStorage.getItem('reviews')) || [],
+      reviews: JSON.parse(localStorage.getItem('reviews')) || {}, // Store reviews by productId
       ratings: JSON.parse(localStorage.getItem('ratings')) || {}, // Store ratings by productId
     };
   },
   mutations: {
+    setSearchTerm(state, searchTerm) {
+      state.searchTerm = searchTerm;
+    },
+    setSorting(state, sorting) {
+      state.sorting = sorting;
+    },
+    setFilterItem(state, filterItem) {
+      state.filterItem = filterItem;
+    },
+    login(state, username) {
+      state.isLoggedIn = true;
+      state.username = username;
+      localStorage.setItem('username', username);
+      localStorage.setItem('jwt', 'example_token');
+    },
+    logout(state) {
+      state.isLoggedIn = false;
+      state.username = '';
+      localStorage.removeItem('username');
+      localStorage.removeItem('jwt');
+    },
     addToCart(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
       if (!state.cart[state.username]) {
         state.cart[state.username] = {};
@@ -56,20 +77,27 @@ const store = createStore({
       state.wishlist = state.wishlist.filter(item => item.id !== productId);
       localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
     },
-    addReview(state, review) {
-      state.reviews.push(review);
+    addReview(state, { productId, review }) {
+      if (!state.reviews[productId]) {
+        state.reviews[productId] = [];
+      }
+      state.reviews[productId].push(review);
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
     },
-    updateReview(state, updatedReview) {
-      const index = state.reviews.findIndex(review => review.id === updatedReview.id);
-      if (index !== -1) {
-        state.reviews[index] = updatedReview;
-        localStorage.setItem('reviews', JSON.stringify(state.reviews));
+    updateReview(state, { productId, review }) {
+      if (state.reviews[productId]) {
+        const index = state.reviews[productId].findIndex(r => r.timestamp === review.timestamp);
+        if (index !== -1) {
+          state.reviews[productId][index] = review;
+          localStorage.setItem('reviews', JSON.stringify(state.reviews));
+        }
       }
     },
-    deleteReview(state, reviewId) {
-      state.reviews = state.reviews.filter(review => review.id !== reviewId);
-      localStorage.setItem('reviews', JSON.stringify(state.reviews));
+    deleteReview(state, { productId, timestamp }) {
+      if (state.reviews[productId]) {
+        state.reviews[productId] = state.reviews[productId].filter(r => r.timestamp !== timestamp);
+        localStorage.setItem('reviews', JSON.stringify(state.reviews));
+      }
     },
     addRating(state, { productId, rating }) {
       if (!state.ratings[productId]) {
@@ -90,6 +118,29 @@ const store = createStore({
         localStorage.setItem('ratings', JSON.stringify(state.ratings));
       }
     },
+    // New mutation for submitting a review
+    submitReview(state, { productId, review, rating }) {
+      // Add review
+      const newReview = {
+        id: Date.now(), // Unique ID based on timestamp
+        productId,
+        review,
+        username: state.username, // Assuming logged in user submits review
+        date: new Date().toISOString(), // Capture date of submission
+      };
+      state.reviews[productId] = state.reviews[productId] || [];
+      state.reviews[productId].push(newReview);
+
+      // Add rating
+      if (!state.ratings[productId]) {
+        state.ratings[productId] = [];
+      }
+      state.ratings[productId].push(rating);
+
+      // Update local storage
+      localStorage.setItem('reviews', JSON.stringify(state.reviews));
+      localStorage.setItem('ratings', JSON.stringify(state.ratings));
+    }
   },
   actions: {
     addToCart({ commit }, payload) {
@@ -110,14 +161,14 @@ const store = createStore({
     removeFromWishlist({ commit }, productId) {
       commit('removeFromWishlist', productId);
     },
-    addReview({ commit }, review) {
-      commit('addReview', review);
+    addReview({ commit }, payload) {
+      commit('addReview', payload);
     },
-    updateReview({ commit }, updatedReview) {
-      commit('updateReview', updatedReview);
+    updateReview({ commit }, payload) {
+      commit('updateReview', payload);
     },
-    deleteReview({ commit }, reviewId) {
-      commit('deleteReview', reviewId);
+    deleteReview({ commit }, payload) {
+      commit('deleteReview', payload);
     },
     addRating({ commit }, payload) {
       commit('addRating', payload);
@@ -127,6 +178,16 @@ const store = createStore({
     },
     deleteRating({ commit }, payload) {
       commit('deleteRating', payload);
+    },
+    // New action for submitting a review
+    submitReview({ commit }, payload) {
+      commit('submitReview', payload);
+    },
+    fetchReviews({ commit }, productId) {
+      const storedReviews = JSON.parse(localStorage.getItem('reviews')) || {};
+      if (storedReviews[productId]) {
+        commit('setReviews', { productId, reviews: storedReviews[productId] });
+      }
     },
   },
   getters: {
@@ -154,13 +215,16 @@ const store = createStore({
       return state.wishlist.length;
     },
     reviewsForProduct: (state) => (productId) => {
-      return state.reviews.filter(review => review.productId === productId);
+      return state.reviews[productId] || [];
     },
     averageRatingForProduct: (state) => (productId) => {
       const ratings = state.ratings[productId] || [];
       if (ratings.length === 0) return 0;
       const sum = ratings.reduce((acc, rating) => acc + rating, 0);
       return (sum / ratings.length).toFixed(1);
+    },
+    productReviews: (state) => (productId) => {
+      return state.reviews[productId] || [];
     },
   },
 });
