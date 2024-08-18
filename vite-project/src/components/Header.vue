@@ -49,6 +49,8 @@
           <CartButton />
           <!-- WishListButton component -->
           <WishListButton />
+          <!-- compareButton component -->
+          <compareButton />
         </div>
         <div v-else class="flex items-center space-x-4">
           <router-link to="/login">
@@ -58,6 +60,8 @@
           <CartButton />
           <!-- WishListButton component -->
           <WishListButton />
+          <!-- compareButton component -->
+          <compareButton />
         </div>
       </div>
     </nav>
@@ -70,11 +74,13 @@ import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import WishListButton from './WishListButton.vue'; // Corrected file name
 import CartButton from './CartButton.vue';
+import compareButton from './compareButton.vue'; // Corrected file name
 
 export default {
   name: 'Header',
   components: {
     CartButton,
+    compareButton, // Register compareButton component
     WishListButton // Register WishListButton component
   },
   setup() {

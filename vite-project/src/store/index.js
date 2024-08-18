@@ -1,3 +1,5 @@
+
+
 import { createStore } from 'vuex';
 
 const store = createStore({
@@ -11,7 +13,8 @@ const store = createStore({
       cart: JSON.parse(localStorage.getItem('cart')) || {},
       wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
       reviews: JSON.parse(localStorage.getItem('reviews')) || {}, // Store reviews by productId
-      ratings: JSON.parse(localStorage.getItem('ratings')) || {}, // Store ratings by productId
+      ratings: JSON.parse(localStorage.getItem('ratings')) || {},
+      comparison: JSON.parse(localStorage.getItem('comparison')) || {}, // Store ratings by productId
     };
   },
   mutations: {
@@ -36,6 +39,42 @@ const store = createStore({
       localStorage.removeItem('username');
       localStorage.removeItem('jwt');
     },
+
+    addToComparison(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
+      if (!state.comparison[state.username]) {
+        state.comparison[state.username] = {};
+      }
+      if (state.comparison[state.username][productId]) {
+        state.comparison[state.username][productId].quantity += quantity;
+      } else {
+        state.comparison[state.username][productId] = { quantity, productPrice, productTitle, productImage };
+      }
+      localStorage.setItem('comparison', JSON.stringify(state.comparison));
+    },
+    updateComparisonItem(state, { productId, quantity }) {
+      if (state.comparison[state.username]) {
+        if (quantity > 0) {
+          state.comparison[state.username][productId].quantity = quantity;
+        } else {
+          delete state.comparison[state.username][productId];
+        }
+        localStorage.setItem('comparison', JSON.stringify(state.comparison));
+      }
+    },
+    removeFromComparison(state, productId) {
+      if (state.comparison[state.username] && state.comparison[state.username][productId]) {
+        delete state.comparison[state.username][productId];
+        localStorage.setItem('comparison', JSON.stringify(state.comparison));
+      }
+    },
+    clearComparison(state) {
+      if (state.comparison[state.username]) {
+        delete state.comparison[state.username];
+        localStorage.setItem('comparison', JSON.stringify(state.comparison));
+      }
+    },
+
+
     addToCart(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
       if (!state.cart[state.username]) {
         state.cart[state.username] = {};
@@ -143,6 +182,19 @@ const store = createStore({
     }
   },
   actions: {
+
+    addToComparison({ commit }, payload) {
+      commit('addToComparison', payload);
+    },
+    updateComparisonItem({ commit }, payload) {
+      commit('updateComparisonItem', payload);
+    },
+    removeFromComparison({ commit }, productId) {
+      commit('removeFromComparison', productId);
+    },
+    clearComparison({ commit }) {
+      commit('clearComparison');
+    },
     addToCart({ commit }, payload) {
       commit('addToCart', payload);
     },
@@ -191,6 +243,28 @@ const store = createStore({
     },
   },
   getters: {
+
+    comparisonItemCount: (state) => {
+      if (!state.isLoggedIn || !state.comparison[state.username]) {
+        return 0;
+      }
+      return Object.values(state.comparison[state.username]).reduce((acc, item) => acc + item.quantity, 0);
+    },
+    comparisonTotalCost: (state) => {
+      if (!state.isLoggedIn || !state.comparison[state.username]) {
+        return 0;
+      }
+      return Object.values(state.comparison[state.username]).reduce((total, item) => {
+        return total + item.quantity * item.productPrice;
+      }, 0).toFixed(2);
+    },
+    comparisonContents: (state) => {
+      if (!state.isLoggedIn || !state.comparison[state.username]) {
+        return {};
+      }
+      return state.comparison[state.username];
+    },
+
     cartItemCount: (state) => {
       if (!state.isLoggedIn || !state.cart[state.username]) {
         return 0;
@@ -228,5 +302,6 @@ const store = createStore({
     },
   },
 });
+
 
 export default store;

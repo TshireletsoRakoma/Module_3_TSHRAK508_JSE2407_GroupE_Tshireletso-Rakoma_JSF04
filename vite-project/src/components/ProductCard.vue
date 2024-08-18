@@ -1,5 +1,5 @@
 <template>
-  <div class="product-card p-4 border rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+  <div class="product-card p-4 border rounded-lg  hover:shadow-xl transition-shadow duration-300">
     <img
       :src="product.image"
       :alt="product.title"
@@ -18,14 +18,14 @@
       <div class="flex items-center justify-between">
         <button
           @click="navigateToProduct(product)"
-          class="view-details-button bg-blue-500 text-white px-4 py-2 rounded"
+          class="view-details-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           View Details
         </button>
         <button
-        type="button"
-          @click="()=>toggleFavorite(product)"
+          @click="toggleFavorite(product)"
           class="favorite-button"
+          type="button"
         >
           <svg
             :class="{ 'text-red-500': isFavorite }"
@@ -36,6 +36,12 @@
           >
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
+        </button>
+        <button
+          class="compare-button bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          @click="handleAddToComparison"
+        >
+          {{ buttonText }}
         </button>
       </div>
     </div>
@@ -71,14 +77,15 @@ export default {
   },
   setup(props) {
     const router = useRouter();
+    const store = useStore();
     const isFavorite = ref(false);
-    const store = useStore(); 
+    const buttonText = ref('Add to Compare');
 
     /**
      * Navigates to the detailed view of the product.
      */
     const navigateToProduct = (product) => {
-      router.push(`/product/${props.product.id}`);
+      router.push(`/product/${product.id}`);
     };
 
     /**
@@ -86,10 +93,13 @@ export default {
      */
     const toggleFavorite = (product) => {
       isFavorite.value = !isFavorite.value;
-      handleAddToWishList(product)
+      handleAddToWishList(product);
     };
+
+    /**
+     * Handles adding the product to the wishlist.
+     */
     const handleAddToWishList = (product) => {
-      console.log(product);
       store.dispatch('addToWishlist', {
         productId: product.id,
         productPrice: product.price,
@@ -99,14 +109,34 @@ export default {
       });
     };
 
+    /**
+     * Handles adding the product to the comparison list.
+     */
+    const handleAddToComparison = () => {
+      store.dispatch('addToComparison', {
+        productId: props.product.id,
+        productPrice: props.product.price,
+        productQuantity: 1,
+        productTitle: props.product.title,
+        productImage: props.product.image,
+      });
+      buttonText.value = 'Added';
+      setTimeout(() => {
+        buttonText.value = 'Add to Comparison';
+      }, 900);
+    };
+
     return {
       navigateToProduct,
       toggleFavorite,
+      handleAddToComparison,
       isFavorite,
+      buttonText,
     };
   },
 }
 </script>
+
 
 <style scoped>
 /**
@@ -154,15 +184,21 @@ export default {
   margin-bottom: 1rem;
 }
 
-.view-details-button {
-  margin-top: 0.5rem;
-  background-color: #007bff;
-  color: white;
+.view-details-button,
+.favorite-button,
+.compare-button {
+  font-size: 0.875rem; /* Slightly smaller font size */
+  padding: 0.375rem 0.75rem; /* Reduced padding for a more compact button */
+  border-radius: 4px; /* Slightly smaller border radius */
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin: 0.25rem; /* Space between buttons */
+}
+
+.view-details-button {
+  background-color: #007bff;
+  color: white;
 }
 
 .view-details-button:hover {
@@ -171,13 +207,23 @@ export default {
 
 .favorite-button {
   background: none;
-  border: none;
-  cursor: pointer;
+  color: #333;
   transition: color 0.2s;
 }
 
 .favorite-button svg {
+  width: 20px; /* Smaller icon size */
+  height: 20px;
   transition: color 0.2s;
+}
+
+.compare-button {
+  background-color: #48bb78;
+  color: white;
+}
+
+.compare-button:hover {
+  background-color: #38a169;
 }
 
 .grid-container {
@@ -186,3 +232,4 @@ export default {
   gap: 1.5rem;
 }
 </style>
+
