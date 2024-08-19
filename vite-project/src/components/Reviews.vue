@@ -70,10 +70,7 @@ export default {
     const loggedIn = computed(() => store.state.isLoggedIn);
 
     const submitReview = () => {
-      // if (!newReview.value.name || !newReview.value.comment || !newReview.value.rating) {
-      //   alert('Please fill in all fields');
-      //   return;
-      // }
+      
 
       const review = {
         ...newReview.value,
