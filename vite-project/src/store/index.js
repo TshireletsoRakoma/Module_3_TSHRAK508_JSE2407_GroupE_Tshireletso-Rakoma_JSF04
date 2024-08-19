@@ -117,11 +117,14 @@ const store = createStore({
       localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
     },
     addReview(state, { productId, review }) {
+      
       if (!state.reviews[productId]) {
         state.reviews[productId] = [];
+      
       }
       state.reviews[productId].push(review);
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
+      console.log("LOL",state.reviews);
     },
     updateReview(state, { productId, review }) {
       if (state.reviews[productId]) {
@@ -157,29 +160,40 @@ const store = createStore({
         localStorage.setItem('ratings', JSON.stringify(state.ratings));
       }
     },
-    // New mutation for submitting a review
     submitReview(state, { productId, review, rating }) {
-      // Add review
+      // Function to update reviews by fetching from an API or other sources
+      async function updateReviews(productId) {
+        try {
+          let reviews = await fetchReviewsForProduct(productId); // Fetch updated reviews for the product
+          console.log(reviews)
+          state.reviews[productId] = reviews; // Update state with fetched reviews
+          localStorage.setItem('reviews', JSON.stringify(state.reviews)); // Store updated reviews in local storage
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        }
+      }
+    
+      // Create a new review object
       const newReview = {
         id: Date.now(), // Unique ID based on timestamp
         productId,
         review,
-        username: state.username, // Assuming logged in user submits review
-        date: new Date().toISOString(), // Capture date of submission
+        rating, // Add rating to the new review
+        username: state.username, // Assuming logged-in user submits the review
+        date: new Date().toISOString(), // Capture the date of submission
       };
+    
+      // Ensure that the reviews array exists for the product
       state.reviews[productId] = state.reviews[productId] || [];
-      state.reviews[productId].push(newReview);
-
-      // Add rating
-      if (!state.ratings[productId]) {
-        state.ratings[productId] = [];
-      }
-      state.ratings[productId].push(rating);
-
-      // Update local storage
+      state.reviews[productId].push(newReview); // Add the new review to the state
+    
+      // Update reviews in local storage
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
-      localStorage.setItem('ratings', JSON.stringify(state.ratings));
+    
+      // Fetch updated reviews to ensure consistency
+      updateReviews(productId);
     }
+    
   },
   actions: {
 
@@ -238,7 +252,7 @@ const store = createStore({
     fetchReviews({ commit }, productId) {
       const storedReviews = JSON.parse(localStorage.getItem('reviews')) || {};
       if (storedReviews[productId]) {
-        commit('setReviews', { productId, reviews: storedReviews[productId] });
+        commit('submitReviews', { productId, reviews: storedReviews[productId] });
       }
     },
   },

@@ -2,10 +2,10 @@
   <div class="reviews-container">
     <h2>Customer Reviews</h2>
     <div v-if="reviews.length > 0">
-      <div v-for="review in reviews" :key="review.timestamp" class="review-item">
-        <p><strong>{{ review.name }}:</strong> {{ review.comment }}</p>
+      <div v-for="review in reviews" :key="review.id" class="review-item">
+        <p><strong>{{ review.username }}:</strong> {{ review.review }}</p>
         <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
-        <p><strong>Date:</strong> {{ formatDate(review.timestamp) }}</p>
+        <p><strong>Date:</strong> {{ formatDate(review.date) }}</p>
       </div>
     </div>
     <div v-else>
@@ -17,7 +17,7 @@
       <h3>Leave a Review</h3>
       <label for="name">Name:</label>
       <input
-        v-model="newReview.name"
+        v-model="newReview.username"
         type="text"
         id="name"
         name="name"
@@ -45,6 +45,7 @@
   </div>
 </template>
 
+
 <script>
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
@@ -53,13 +54,14 @@ export default {
   name: 'Reviews',
   props: {
     productId: {
-      type: String,
+      type: [String,Number],
       required: true,
     },
   },
   setup(props) {
     const store = useStore();
     const reviews = computed(() => store.getters.productReviews(props.productId) || []);
+    console.log(reviews)
     const newReview = ref({
       name: '',
       comment: '',
@@ -68,10 +70,10 @@ export default {
     const loggedIn = computed(() => store.state.isLoggedIn);
 
     const submitReview = () => {
-      if (!newReview.value.name || !newReview.value.comment || !newReview.value.rating) {
-        alert('Please fill in all fields');
-        return;
-      }
+      // if (!newReview.value.name || !newReview.value.comment || !newReview.value.rating) {
+      //   alert('Please fill in all fields');
+      //   return;
+      // }
 
       const review = {
         ...newReview.value,
@@ -104,8 +106,10 @@ export default {
     });
 
     onMounted(() => {
-      store.dispatch('fetchReviews', props.productId);
-    });
+  console.log('Fetched Reviews:', reviews.value);
+  store.dispatch('fetchReviews', props.productId);
+});
+
 
     return {
       reviews,

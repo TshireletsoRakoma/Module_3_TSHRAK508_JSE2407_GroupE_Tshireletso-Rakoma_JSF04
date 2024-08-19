@@ -28,7 +28,7 @@
 
       <!-- Reviews Section -->
       <div v-if="showReviews" class="reviews-list">
-        <Reviews :productId="product.id" />
+        <Reviews :productId="product.id.toString()" />
       </div>
 
       
