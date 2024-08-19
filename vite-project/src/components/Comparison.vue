@@ -5,9 +5,9 @@
         Your cart is empty.
       </div>
       <div v-else class="comparison-items">
-        <div v-for="(item, productId) in cartContents" :key="productId" class="comparison-item">
+        <div v-for="(item, productId) in comparisonContents" :key="productId" class="comparison-item">
           <!-- Display the product image -->
-          <img :src="getProductImage(productId, item)" :alt="getProductName(productId)" class="product-image"/>
+          <img :src="item.productImage" :alt="getProductName(productId)" class="product-image"/>
           
           <div class="item-details">
             <p>{{ item.productTitle }}</p>
@@ -42,7 +42,7 @@
   export default {
     name: "Comparison",
     computed: {
-      ...mapGetters(['comparisonItemCount', 'comparisonTotalCost', 'cartContents']),
+      ...mapGetters(['comparisonItemCount', 'comparisonTotalCost', 'cartContents','comparisonContents']),
     },
     methods: {
       ...mapActions(['removeFromComparison']),

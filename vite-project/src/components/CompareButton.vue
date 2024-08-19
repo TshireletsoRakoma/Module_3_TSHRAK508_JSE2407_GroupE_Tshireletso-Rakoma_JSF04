@@ -5,8 +5,8 @@
     <button class="compare-button flex items-center space-x-2">
       <router-link to="/comparison" class="relative">
         <img src="../assets/Compare button.svg" alt="Cart" class="w-6 h-6"/>
-        <span v-if="cartItemCount > 0" class="item-count absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1">
-            {{ comparisonCount }}
+        <span v-if="comparisonItemCount > 0" class="item-count absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1">
+            {{ comparisonItemCount}}
         </span>
       </router-link>
     </button>
@@ -20,7 +20,7 @@
   export default {
     name: 'CompareButton',
     computed: {
-      ...mapGetters(['comparisonCount']),
+      ...mapGetters(['comparisonItemCount',]),
     },
   };
   </script>

@@ -2,8 +2,8 @@
   <button class="wishlist-button flex items-center space-x-2">
     <router-link to="/wishlist" class="relative flex items-center">
       <img src="../assets/wish.svg" alt="Wishlist" class="w-6 h-6"/>
-      <span v-if="wishlistCount > 0" class="wishlist-count absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1">
-        {{ wishlistCount }}
+      <span v-if="wishlistItemCount > 0" class="wishlist-count absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-1">
+        {{ wishlistItemCount }}
       </span>
     </router-link>
   </button>
@@ -15,7 +15,7 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'WishListButton',
   computed: {
-    ...mapGetters(['wishlistCount']),
+    ...mapGetters(['wishlistItemCount']),
   },
 };
 </script>
