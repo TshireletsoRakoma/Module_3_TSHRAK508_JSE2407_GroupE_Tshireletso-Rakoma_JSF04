@@ -13,7 +13,12 @@ const store = createStore({
       reviews: JSON.parse(localStorage.getItem('reviews')) || {}, 
       ratings: JSON.parse(localStorage.getItem('ratings')) || {},
       comparison: JSON.parse(localStorage.getItem('comparison')) || {}, 
-      Checkout: JSON.parse(localStorage.getItem('Checkout')) || {}, 
+      Checkout: JSON.parse(localStorage.getItem('Checkout')) || {},
+      userInfo: JSON.parse(localStorage.getItem('userInfo')) || { // New state for user information
+        name: '',
+        address: '',
+        email: ''
+      } 
     };
   },
   mutations: {
