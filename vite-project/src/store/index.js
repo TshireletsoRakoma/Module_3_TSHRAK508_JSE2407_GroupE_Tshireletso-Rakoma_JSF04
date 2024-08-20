@@ -1,5 +1,3 @@
-
-
 import { createStore } from 'vuex';
 
 const store = createStore({
@@ -12,9 +10,9 @@ const store = createStore({
       username: localStorage.getItem('username') || '',
       cart: JSON.parse(localStorage.getItem('cart')) || {},
       wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
-      reviews: JSON.parse(localStorage.getItem('reviews')) || {}, // Store reviews by productId
+      reviews: JSON.parse(localStorage.getItem('reviews')) || {}, 
       ratings: JSON.parse(localStorage.getItem('ratings')) || {},
-      comparison: JSON.parse(localStorage.getItem('comparison')) || {}, // Store ratings by productId
+      comparison: JSON.parse(localStorage.getItem('comparison')) || {}, 
     };
   },
   mutations: {
@@ -40,17 +38,18 @@ const store = createStore({
       localStorage.removeItem('jwt');
     },
 
-    addToComparison(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
+    addToComparison(state, { productId, productPrice, quantity = 1, productTitle, productImage, productDescription }) {
       if (!state.comparison[state.username]) {
         state.comparison[state.username] = {};
       }
       if (state.comparison[state.username][productId]) {
         state.comparison[state.username][productId].quantity += quantity;
       } else {
-        state.comparison[state.username][productId] = { quantity, productPrice, productTitle, productImage };
+        state.comparison[state.username][productId] = { quantity, productPrice, productTitle, productImage, description: productDescription };
       }
       localStorage.setItem('comparison', JSON.stringify(state.comparison));
     },
+    
     updateComparisonItem(state, { productId, quantity }) {
       if (state.comparison[state.username]) {
         if (quantity > 0) {
@@ -61,19 +60,21 @@ const store = createStore({
         localStorage.setItem('comparison', JSON.stringify(state.comparison));
       }
     },
+    
+    // Updated mutation
     removeFromComparison(state, productId) {
       if (state.comparison[state.username] && state.comparison[state.username][productId]) {
-        delete state.comparison[state.username][productId];
+        delete state.comparison[state.username][productId]; // Directly using the delete operator for Vue 3
         localStorage.setItem('comparison', JSON.stringify(state.comparison));
       }
     },
+    
     clearComparison(state) {
       if (state.comparison[state.username]) {
         delete state.comparison[state.username];
         localStorage.setItem('comparison', JSON.stringify(state.comparison));
       }
     },
-
 
     addToCart(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
       if (!state.cart[state.username]) {
@@ -120,11 +121,9 @@ const store = createStore({
       
       if (!state.reviews[productId]) {
         state.reviews[productId] = [];
-      
       }
       state.reviews[productId].push(review);
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
-      console.log("LOL",state.reviews);
     },
     updateReview(state, { productId, review }) {
       if (state.reviews[productId]) {
@@ -164,33 +163,28 @@ const store = createStore({
       // Function to update reviews by fetching from an API or other sources
       async function updateReviews(productId) {
         try {
-          let reviews = await fetchReviewsForProduct(productId); // Fetch updated reviews for the product
-          console.log(reviews)
-          state.reviews[productId] = reviews; // Update state with fetched reviews
-          localStorage.setItem('reviews', JSON.stringify(state.reviews)); // Store updated reviews in local storage
+          let reviews = await fetchReviewsForProduct(productId); 
+          state.reviews[productId] = reviews; 
+          localStorage.setItem('reviews', JSON.stringify(state.reviews)); 
         } catch (error) {
           console.error('Error fetching reviews:', error);
         }
       }
     
-      // Create a new review object
       const newReview = {
-        id: Date.now(), // Unique ID based on timestamp
+        id: Date.now(),
         productId,
         review,
-        rating, // Add rating to the new review
-        username: state.username, // Assuming logged-in user submits the review
-        date: new Date().toISOString(), // Capture the date of submission
+        rating, 
+        username: state.username, 
+        date: new Date().toISOString(), 
       };
     
-      // Ensure that the reviews array exists for the product
       state.reviews[productId] = state.reviews[productId] || [];
-      state.reviews[productId].push(newReview); // Add the new review to the state
+      state.reviews[productId].push(newReview);
     
-      // Update reviews in local storage
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
     
-      // Fetch updated reviews to ensure consistency
       updateReviews(productId);
     }
     
@@ -229,6 +223,7 @@ const store = createStore({
     },
     addReview({ commit }, payload) {
       commit('addReview', payload);
+
     },
     updateReview({ commit }, payload) {
       commit('updateReview', payload);
@@ -277,7 +272,8 @@ const store = createStore({
         return {};
       }
       return state.comparison[state.username];
-    },
+    } ,
+   
 
     cartItemCount: (state) => {
       if (!state.isLoggedIn || !state.cart[state.username]) {

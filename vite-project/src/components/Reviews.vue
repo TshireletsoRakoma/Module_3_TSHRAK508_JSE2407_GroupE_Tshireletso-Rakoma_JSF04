@@ -63,7 +63,7 @@ export default {
     const reviews = computed(() => store.getters.productReviews(props.productId) || []);
     console.log(reviews)
     const newReview = ref({
-      name: '',
+      username: '',
       comment: '',
       rating: '',
     });
@@ -74,7 +74,7 @@ export default {
 
       const review = {
         ...newReview.value,
-        timestamp: new Date().toISOString(),
+        date: new Date().toISOString(),
       };
 
       store.dispatch('submitReview', { productId: props.productId, review });

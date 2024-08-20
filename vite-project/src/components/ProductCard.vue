@@ -119,6 +119,7 @@ export default {
         productQuantity: 1,
         productTitle: props.product.title,
         productImage: props.product.image,
+        productDescription:props.product.description
       });
       buttonText.value = 'Added';
       setTimeout(() => {
