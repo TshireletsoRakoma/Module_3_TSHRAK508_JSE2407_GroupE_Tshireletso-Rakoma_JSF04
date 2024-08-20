@@ -1,3 +1,5 @@
+
+
 import { createStore } from 'vuex';
 
 const store = createStore({
@@ -10,15 +12,15 @@ const store = createStore({
       username: localStorage.getItem('username') || '',
       cart: JSON.parse(localStorage.getItem('cart')) || {},
       wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
-      reviews: JSON.parse(localStorage.getItem('reviews')) || {}, 
+      reviews: JSON.parse(localStorage.getItem('reviews')) || {}, // Store reviews by productId
       ratings: JSON.parse(localStorage.getItem('ratings')) || {},
-      comparison: JSON.parse(localStorage.getItem('comparison')) || {}, 
+      comparison: JSON.parse(localStorage.getItem('comparison')) || {}, // Store ratings by productId
       Checkout: JSON.parse(localStorage.getItem('Checkout')) || {},
-      userInfo: JSON.parse(localStorage.getItem('userInfo')) || { // New state for user information
+      userInfo: JSON.parse(localStorage.getItem('userInfo')) || {
         name: '',
         address: '',
         email: ''
-      } 
+      }
     };
   },
   mutations: {
@@ -43,30 +45,18 @@ const store = createStore({
       localStorage.removeItem('username');
       localStorage.removeItem('jwt');
     },
-    updateUserInfo(state, userInfo) {
-      state.userInfo = userInfo;
-      localStorage.setItem('userInfo', JSON.stringify(userInfo));
-    },
-    // You may need a mutation for updating just specific fields if the entire object is not always updated
-    updateUserField(state, { field, value }) {
-      state.userInfo[field] = value;
-      localStorage.setItem('userInfo', JSON.stringify(state.userInfo));
-    }
-  },
 
-
-    addToComparison(state, { productId, productPrice, quantity = 1, productTitle, productImage, productDescription }) {
+    addToComparison(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
       if (!state.comparison[state.username]) {
         state.comparison[state.username] = {};
       }
       if (state.comparison[state.username][productId]) {
         state.comparison[state.username][productId].quantity += quantity;
       } else {
-        state.comparison[state.username][productId] = { quantity, productPrice, productTitle, productImage, description: productDescription };
+        state.comparison[state.username][productId] = { quantity, productPrice, productTitle, productImage };
       }
       localStorage.setItem('comparison', JSON.stringify(state.comparison));
     },
-    
     updateComparisonItem(state, { productId, quantity }) {
       if (state.comparison[state.username]) {
         if (quantity > 0) {
@@ -77,21 +67,19 @@ const store = createStore({
         localStorage.setItem('comparison', JSON.stringify(state.comparison));
       }
     },
-    
-    // Updated mutation
     removeFromComparison(state, productId) {
       if (state.comparison[state.username] && state.comparison[state.username][productId]) {
-        delete state.comparison[state.username][productId]; // Directly using the delete operator for Vue 3
+        delete state.comparison[state.username][productId];
         localStorage.setItem('comparison', JSON.stringify(state.comparison));
       }
     },
-    
     clearComparison(state) {
       if (state.comparison[state.username]) {
         delete state.comparison[state.username];
         localStorage.setItem('comparison', JSON.stringify(state.comparison));
       }
     },
+
 
     addToCart(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
       if (!state.cart[state.username]) {
@@ -138,9 +126,11 @@ const store = createStore({
       
       if (!state.reviews[productId]) {
         state.reviews[productId] = [];
+      
       }
       state.reviews[productId].push(review);
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
+      console.log("LOL",state.reviews);
     },
     updateReview(state, { productId, review }) {
       if (state.reviews[productId]) {
@@ -176,37 +166,64 @@ const store = createStore({
         localStorage.setItem('ratings', JSON.stringify(state.ratings));
       }
     },
+    updateUserInfo(state, userInfo) {
+      state.userInfo = userInfo;
+      localStorage.setItem('userInfo', JSON.stringify(state.userInfo));
+    },
+
     submitReview(state, { productId, review, rating }) {
       // Function to update reviews by fetching from an API or other sources
       async function updateReviews(productId) {
         try {
-          let reviews = await fetchReviewsForProduct(productId); 
-          state.reviews[productId] = reviews; 
-          localStorage.setItem('reviews', JSON.stringify(state.reviews)); 
+          let reviews = await fetchReviewsForProduct(productId); // Fetch updated reviews for the product
+          console.log(reviews)
+          state.reviews[productId] = reviews; // Update state with fetched reviews
+          localStorage.setItem('reviews', JSON.stringify(state.reviews)); // Store updated reviews in local storage
         } catch (error) {
           console.error('Error fetching reviews:', error);
         }
       }
     
+      // Create a new review object
       const newReview = {
-        id: Date.now(),
+        id: Date.now(), // Unique ID based on timestamp
         productId,
         review,
-        rating, 
-        username: state.username, 
-        date: new Date().toISOString(), 
+        rating, // Add rating to the new review
+        username: state.username, // Assuming logged-in user submits the review
+        date: new Date().toISOString(), // Capture the date of submission
       };
     
+      // Ensure that the reviews array exists for the product
       state.reviews[productId] = state.reviews[productId] || [];
-      state.reviews[productId].push(newReview);
+      state.reviews[productId].push(newReview); // Add the new review to the state
     
+      // Update reviews in local storage
       localStorage.setItem('reviews', JSON.stringify(state.reviews));
     
+      // Fetch updated reviews to ensure consistency
       updateReviews(productId);
     }
     
   },
   actions: {
+
+    async updateUserInfo({ commit }, userInfo) {
+      try {
+        await apiUpdateUserInfo(userInfo);
+        commit('updateUserInfo', userInfo);
+      } catch (error) {
+        console.error('Failed to update user information:', error);
+      }
+    },
+    async updateUserField({ commit }, payload) {
+      try {
+        await apiUpdateUserField(payload);
+        commit('updateUserField', payload);
+      } catch (error) {
+        console.error('Failed to update user field:', error);
+      }
+    },
 
     addToComparison({ commit }, payload) {
       commit('addToComparison', payload);
@@ -240,7 +257,6 @@ const store = createStore({
     },
     addReview({ commit }, payload) {
       commit('addReview', payload);
-
     },
     updateReview({ commit }, payload) {
       commit('updateReview', payload);
@@ -289,12 +305,13 @@ const store = createStore({
         return {};
       }
       return state.comparison[state.username];
-    } ,
-   
+    },
 
     cartItemCount: (state) => {
-      const userCart = state.cart[state.username] || {};
-      return Object.values(userCart).reduce((total, item) => total + item.quantity, 0);
+      if (!state.isLoggedIn || !state.cart[state.username]) {
+        return 0;
+      }
+      return Object.values(state.cart[state.username]).reduce((acc, item) => acc + item.quantity, 0);
     },
     cartTotalCost: (state) => {
       if (!state.isLoggedIn || !state.cart[state.username]) {
@@ -324,6 +341,9 @@ const store = createStore({
     },
     productReviews: (state) => (productId) => {
       return state.reviews[productId] || [];
+    },
+    currentUser: (state) => {
+      return state.isLoggedIn ? state.userInfo : null;
     },
   },
 });

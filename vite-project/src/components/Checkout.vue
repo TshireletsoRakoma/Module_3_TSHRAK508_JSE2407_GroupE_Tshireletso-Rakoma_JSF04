@@ -31,9 +31,9 @@
     data() {
       return {
         user: {
-          name: this.currentUser.name || '',
-          address: this.currentUser.address || '',
-          email: this.currentUser.email || ''
+          name: this.currentUser?.name || '', // Use optional chaining to avoid undefined errors
+          address: this.currentUser?.address || '',
+          email: this.currentUser?.email || ''
         }
       };
     },
@@ -57,6 +57,7 @@
     }
   }
   </script>
+  
   
   <style scoped>
   .checkout-container {
