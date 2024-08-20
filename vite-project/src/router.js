@@ -8,22 +8,20 @@ import WishList from './components/WishList2.vue';
 import StarRating from './components/StarRating.vue';
 import Reviews from './components/Reviews.vue';
 import Comparison from './components/Comparison.vue';
+import Checkout from './components/Checkout.vue'; // Make sure the path and name match
 
 const routes = [
-  { path: '/', name: 'ProductList', component: ProductList },
-  { path: '/product/:id', name: 'ProductDetails', component: ProductDetails },
+  { path: '/', name: 'ProductList', component: ProductList }, // Main page
   { path: '/login', name: 'Login', component: Login },
+  { path: '/product/:id', name: 'ProductDetails', component: ProductDetails },
   { path: '/cart', name: 'Cart', component: Cart, meta: { requiresAuth: true } }, // Protected route
   { path: '/wishlist', name: 'WishList', component: WishList, meta: { requiresAuth: true } }, // Protected route
   { path: '/star-rating', name: 'StarRating', component: StarRating },
   { path: '/reviews', name: 'Reviews', component: Reviews },
   { path: '/reviews/:id', name: 'ReviewDetails', component: Reviews },
-  {
-    path: '/comparison',
-    name: 'Comparison',
-    component: Comparison,
-    meta: { requiresAuth: true }, // Protected route
-  },
+  { path: '/comparison', name: 'Comparison', component: Comparison, meta: { requiresAuth: true } }, // Protected route
+  { path: '/checkout', name: 'Checkout', component: Checkout, meta: { requiresAuth: true } }, // Updated route path
+  { path: '/:catchAll(.*)', redirect: '/' }, // Redirect to main page for undefined paths
 ];
 
 const router = createRouter({
@@ -32,12 +30,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = store.state.isLoggedIn; // Use Vuex state
+  const isAuthenticated = store.state.isLoggedIn; // Vuex state
 
-  console.log('Navigating to:', to.fullPath);
-  console.log('Is authenticated:', isAuthenticated);
-
-  // Redirect to login if the route requires authentication and the user is not authenticated
   if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } });
   } else {

@@ -13,6 +13,7 @@ const store = createStore({
       reviews: JSON.parse(localStorage.getItem('reviews')) || {}, 
       ratings: JSON.parse(localStorage.getItem('ratings')) || {},
       comparison: JSON.parse(localStorage.getItem('comparison')) || {}, 
+      Checkout: JSON.parse(localStorage.getItem('Checkout')) || {}, 
     };
   },
   mutations: {
@@ -276,10 +277,8 @@ const store = createStore({
    
 
     cartItemCount: (state) => {
-      if (!state.isLoggedIn || !state.cart[state.username]) {
-        return 0;
-      }
-      return Object.values(state.cart[state.username]).reduce((acc, item) => acc + item.quantity, 0);
+      const userCart = state.cart[state.username] || {};
+      return Object.values(userCart).reduce((total, item) => total + item.quantity, 0);
     },
     cartTotalCost: (state) => {
       if (!state.isLoggedIn || !state.cart[state.username]) {
