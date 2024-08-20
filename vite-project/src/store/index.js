@@ -43,6 +43,17 @@ const store = createStore({
       localStorage.removeItem('username');
       localStorage.removeItem('jwt');
     },
+    updateUserInfo(state, userInfo) {
+      state.userInfo = userInfo;
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+    },
+    // You may need a mutation for updating just specific fields if the entire object is not always updated
+    updateUserField(state, { field, value }) {
+      state.userInfo[field] = value;
+      localStorage.setItem('userInfo', JSON.stringify(state.userInfo));
+    }
+  },
+
 
     addToComparison(state, { productId, productPrice, quantity = 1, productTitle, productImage, productDescription }) {
       if (!state.comparison[state.username]) {
