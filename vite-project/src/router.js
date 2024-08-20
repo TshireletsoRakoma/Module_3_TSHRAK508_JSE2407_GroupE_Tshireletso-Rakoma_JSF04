@@ -9,6 +9,7 @@ import StarRating from './components/StarRating.vue';
 import Reviews from './components/Reviews.vue';
 import Comparison from './components/Comparison.vue';
 import Checkout from './components/Checkout.vue'; // Make sure the path and name match
+import OrderHistory from './components/OrderHistory.vue';
 
 const routes = [
   { path: '/', name: 'ProductList', component: ProductList }, // Main page
@@ -21,6 +22,7 @@ const routes = [
   { path: '/reviews/:id', name: 'ReviewDetails', component: Reviews },
   { path: '/comparison', name: 'Comparison', component: Comparison, meta: { requiresAuth: true } }, // Protected route
   { path: '/checkout', name: 'Checkout', component: Checkout, meta: { requiresAuth: true } }, // Updated route path
+  { path: '/orderHistory', name: 'OrderHistory', component: OrderHistory },
   { path: '/:catchAll(.*)', redirect: '/' }, // Redirect to main page for undefined paths
 ];
 

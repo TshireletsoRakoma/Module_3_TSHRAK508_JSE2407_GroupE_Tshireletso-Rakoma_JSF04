@@ -20,7 +20,9 @@ const store = createStore({
         name: '',
         address: '',
         email: ''
-      }
+      },
+      orderHistory: JSON.parse(localStorage.getItem('orderHistory')) || {},
+
     };
   },
   mutations: {
