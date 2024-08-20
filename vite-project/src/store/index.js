@@ -1,5 +1,3 @@
-
-
 import { createStore } from 'vuex';
 
 const store = createStore({
@@ -26,6 +24,16 @@ const store = createStore({
     };
   },
   mutations: {
+    ADD_ORDER(state, order) {
+      state.orders.push(order);
+    },
+    CLEAR_CART(state) {
+      state.cart = [];
+    },
+    REMOVE_ORDER(state, orderId) {
+      state.orders = state.orders.filter(order => order.id !== orderId);
+    },
+
     setSearchTerm(state, searchTerm) {
       state.searchTerm = searchTerm;
     },
@@ -209,6 +217,19 @@ const store = createStore({
     
   },
   actions: {
+    updateUserDetails({ commit }, user) {
+      // Update user information logic
+    },
+    placeOrder({ commit, state }, order) {
+      // Save the order to the Vuex state
+      commit('ADD_ORDER', { ...order, id: Date.now() });
+      // Clear the cart after placing the order
+      commit('CLEAR_CART');
+    },
+    cancelOrder({ commit }, orderId) {
+      // Cancel the order logic
+      commit('REMOVE_ORDER', orderId);
+    },
 
     async updateUserInfo({ commit }, userInfo) {
       try {
@@ -347,6 +368,10 @@ const store = createStore({
     currentUser: (state) => {
       return state.isLoggedIn ? state.userInfo : null;
     },
+    currentUser: state => state.user,
+    cartItems: state => state.cart,
+    totalPrice: state => state.cart.reduce((total, item) => total + (item.price * item.quantity), 0),
+    pastOrders: state => state.orders
   },
 });
 
