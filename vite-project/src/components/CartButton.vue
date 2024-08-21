@@ -12,9 +12,24 @@
 <script>
 import { mapGetters } from 'vuex';
 
+/**
+ * CartButton component.
+ * 
+ * Displays a button with a cart icon and the number of items in the cart. Clicking the button navigates to the cart page.
+ * 
+ * @component
+ */
 export default {
   name: 'CartButton',
   computed: {
+    /**
+     * Vuex getter for the number of items in the cart.
+     * 
+     * @computed
+     * @name cartItemCount
+     * @type {number}
+     * @memberof CartButton
+     */
     ...mapGetters(['cartItemCount']),
   },
 };

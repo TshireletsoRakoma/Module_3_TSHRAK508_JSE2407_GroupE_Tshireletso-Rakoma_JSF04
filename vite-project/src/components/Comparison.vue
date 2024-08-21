@@ -45,24 +45,62 @@
   </main>
 </template>
 
-
 <script>
 import { mapGetters, mapActions } from 'vuex';
 
+/**
+ * Comparison component.
+ * 
+ * Displays a list of compared items with their details, total items, and total cost.
+ * Allows users to remove individual items, clear all items, and navigate back to the home page.
+ * 
+ * @component
+ */
 export default {
   name: "Comparison",
   computed: {
+    /**
+     * Retrieves the count of items in the comparison list from Vuex store.
+     * 
+     * @computed
+     * @name comparisonItemCount
+     * @type {number}
+     * @memberof Comparison
+     */
     ...mapGetters(['comparisonItemCount', 'comparisonTotalCost', 'comparisonContents']),
+    
+    /**
+     * Maps the comparison contents object to an array of items for easier iteration.
+     * 
+     * @computed
+     * @name comparisonContentsArray
+     * @type {Array<Object>}
+     * @memberof Comparison
+     */
     comparisonContentsArray() {
       return Object.entries(this.comparisonContents).map(([productId, item]) => ({ productId, ...item }));
     }
   },
   methods: {
+    /**
+     * Removes a specific item from the comparison list based on its product ID.
+     * 
+     * @method
+     * @param {string} productId - The ID of the product to remove.
+     * @memberof Comparison
+     */
     ...mapActions(['removeFromComparison', 'clearComparison']),
     removeItem(productId) {
       console.log('Removing product with ID:', productId); // Debugging log
       this.removeFromComparison(productId);
     },
+
+    /**
+     * Clears all items from the comparison list.
+     * 
+     * @method
+     * @memberof Comparison
+     */
     clearAllItems() {
       console.log('Clearing all comparison items'); // Debugging log
       this.clearComparison();
@@ -70,7 +108,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .comparison-container {

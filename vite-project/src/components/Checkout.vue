@@ -62,27 +62,70 @@ import { mapGetters, mapActions } from 'vuex';
 import { loadScript } from "@paypal/paypal-js";
 import OrderHistory from './OrderHistory.vue'; // Import OrderHistory component
 
+/**
+ * Checkout component.
+ * 
+ * Handles user checkout process including user information update, order summary display, and payment processing via PayPal.
+ * 
+ * @component
+ */
 export default {
   name: "Checkout",
   components: {
     OrderHistory
   },
   computed: {
+    /**
+     * Vuex getter for the current user details.
+     * 
+     * @computed
+     * @name currentUser
+     * @type {Object}
+     * @memberof Checkout
+     */
     ...mapGetters(['currentUser', 'cartItems', 'totalPrice']),
   },
   data() {
     return {
+      /**
+       * User information for updating.
+       * 
+       * @type {Object}
+       * @property {string} name - User's name.
+       * @property {string} address - User's residential address.
+       * @property {string} email - User's email address.
+       */
       user: {
         name: this.currentUser?.name || '',
         address: this.currentUser?.address || '',
         email: this.currentUser?.email || ''
       },
+      /**
+       * Flag indicating if payment was successful.
+       * 
+       * @type {boolean}
+       */
       paymentSuccess: false,
+      /**
+       * Flag indicating if there was a payment error.
+       * 
+       * @type {boolean}
+       */
       paymentError: false,
-      showOrderHistory: false, // Control the visibility of the order history modal
+      /**
+       * Flag controlling the visibility of the order history modal.
+       * 
+       * @type {boolean}
+       */
+      showOrderHistory: false,
     };
   },
   methods: {
+    /**
+     * Updates user information by dispatching the `updateUserDetails` action.
+     * 
+     * @method
+     */
     ...mapActions(['updateUserDetails', 'placeOrder']),
     updateUserInfo() {
       this.updateUserDetails(this.user).then(() => {
@@ -92,6 +135,13 @@ export default {
         alert('Failed to update information. Please try again.');
       });
     },
+    /**
+     * Handles PayPal payment integration.
+     * 
+     * Loads the PayPal script and sets up PayPal Buttons with order creation and approval handlers.
+     * 
+     * @method
+     */
     handlePayment() {
       loadScript({ "client-id": "YOUR_SANDBOX_CLIENT_ID" }).then(paypal => {
         paypal.Buttons({
@@ -119,6 +169,12 @@ export default {
     }
   },
   created() {
+    /**
+     * Checks if the user is authenticated. If not, redirects to the login page.
+     * Initializes the PayPal payment button if the user is authenticated.
+     * 
+     * @method
+     */
     if (!this.currentUser) {
       this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } });
     } else {
@@ -127,6 +183,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .checkout-container {
