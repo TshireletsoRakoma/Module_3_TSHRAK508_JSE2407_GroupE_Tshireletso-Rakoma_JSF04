@@ -10,6 +10,7 @@ const store = createStore({
       username: localStorage.getItem('username') || '',
       cart: JSON.parse(localStorage.getItem('cart')) || {},
       wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
+      wishlist2: JSON.parse(localStorage.getItem('wishlist2')) || [],
       reviews: JSON.parse(localStorage.getItem('reviews')) || {}, // Store reviews by productId
       ratings: JSON.parse(localStorage.getItem('ratings')) || {},
       comparison: JSON.parse(localStorage.getItem('comparison')) || {}, // Store ratings by productId
@@ -24,6 +25,13 @@ const store = createStore({
     };
   },
   mutations: {
+
+    SET_WISHLIST(state, wishlist) {
+      state.wishlist = wishlist;
+    },
+    REMOVE_FROM_WISHLIST(state, productId) {
+      state.wishlist = state.wishlist.filter(item => item.productId !== productId);
+    },
     ADD_ORDER(state, order) {
       state.orders.push(order);
     },
@@ -124,6 +132,23 @@ const store = createStore({
         localStorage.setItem('cart', JSON.stringify(state.cart));
       }
     },
+    addToCart(state, { productId, productPrice, quantity = 1, productTitle, productImage }) {
+      if (!state.cart[state.username]) {
+        state.cart[state.username] = {};
+      }
+      if (state.cart[state.username][productId]) {
+        state.cart[state.username][productId].quantity += quantity;
+      } else {
+        state.cart[state.username][productId] = { quantity, productPrice, productTitle, productImage };
+      }
+      localStorage.setItem('cart', JSON.stringify(state.cart));
+    },
+    
+    removeFromWishlist(state, productId) {
+      state.wishlist = state.wishlist.filter(item => item.productId !== productId);
+      localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
+    },
+    
     addToWishlist(state, product) {
       state.wishlist.push(product);
       localStorage.setItem('wishlist', JSON.stringify(state.wishlist));
@@ -217,20 +242,18 @@ const store = createStore({
     
   },
   actions: {
-    updateUserDetails({ commit }, user) {
-      // Update user information logic
+    // Add an item to the cart and remove it from the wishlist
+    async addToCart({ commit }, cartPayload) {
+      try {
+        await apiAddToCart(cartPayload);
+        commit('addToCart', cartPayload);
+        commit('removeFromWishlist', cartPayload.productId); // Remove from wishlist after adding to cart
+      } catch (error) {
+        console.error('Failed to add to cart:', error);
+      }
     },
-    placeOrder({ commit, state }, order) {
-      // Save the order to the Vuex state
-      commit('ADD_ORDER', { ...order, id: Date.now() });
-      // Clear the cart after placing the order
-      commit('CLEAR_CART');
-    },
-    cancelOrder({ commit }, orderId) {
-      // Cancel the order logic
-      commit('REMOVE_ORDER', orderId);
-    },
-
+    
+    // Update user information
     async updateUserInfo({ commit }, userInfo) {
       try {
         await apiUpdateUserInfo(userInfo);
@@ -239,6 +262,8 @@ const store = createStore({
         console.error('Failed to update user information:', error);
       }
     },
+    
+    // Update a specific user field
     async updateUserField({ commit }, payload) {
       try {
         await apiUpdateUserField(payload);
@@ -247,59 +272,104 @@ const store = createStore({
         console.error('Failed to update user field:', error);
       }
     },
-
+  
+    // Place an order and clear the cart
+    placeOrder({ commit, state }, order) {
+      commit('ADD_ORDER', { ...order, id: Date.now() });
+      commit('CLEAR_CART');
+    },
+    
+    // Cancel an order
+    cancelOrder({ commit }, orderId) {
+      commit('REMOVE_ORDER', orderId);
+    },
+    
+    // Add an item to the comparison list
     addToComparison({ commit }, payload) {
       commit('addToComparison', payload);
     },
+    
+    // Update a comparison item
     updateComparisonItem({ commit }, payload) {
       commit('updateComparisonItem', payload);
     },
+    
+    // Remove an item from the comparison list
     removeFromComparison({ commit }, productId) {
       commit('removeFromComparison', productId);
     },
+    
+    // Clear the comparison list
     clearComparison({ commit }) {
       commit('clearComparison');
     },
+    
+    // Add an item to the cart
     addToCart({ commit }, payload) {
       commit('addToCart', payload);
     },
+    
+    // Update a cart item
     updateCartItem({ commit }, payload) {
       commit('updateCartItem', payload);
     },
+    
+    // Remove an item from the cart
     removeFromCart({ commit }, productId) {
       commit('removeFromCart', productId);
     },
+    
+    // Clear the cart
     clearCart({ commit }) {
       commit('clearCart');
     },
+    
+    // Add an item to the wishlist
     addToWishlist({ commit }, product) {
       commit('addToWishlist', product);
     },
+    
+    // Remove an item from the wishlist
     removeFromWishlist({ commit }, productId) {
       commit('removeFromWishlist', productId);
     },
+    
+    // Add a review
     addReview({ commit }, payload) {
       commit('addReview', payload);
     },
+    
+    // Update a review
     updateReview({ commit }, payload) {
       commit('updateReview', payload);
     },
+    
+    // Delete a review
     deleteReview({ commit }, payload) {
       commit('deleteReview', payload);
     },
+    
+    // Add a rating
     addRating({ commit }, payload) {
       commit('addRating', payload);
     },
+    
+    // Update a rating
     updateRating({ commit }, payload) {
       commit('updateRating', payload);
     },
+    
+    // Delete a rating
     deleteRating({ commit }, payload) {
       commit('deleteRating', payload);
     },
-    // New action for submitting a review
+    
+    // Submit a review
     submitReview({ commit }, payload) {
       commit('submitReview', payload);
     },
+    
+    // Fetch reviews for a product
     fetchReviews({ commit }, productId) {
       const storedReviews = JSON.parse(localStorage.getItem('reviews')) || {};
       if (storedReviews[productId]) {
@@ -307,6 +377,7 @@ const store = createStore({
       }
     },
   },
+  
   getters: {
 
     comparisonItemCount: (state) => {
@@ -350,9 +421,14 @@ const store = createStore({
       }
       return state.cart[state.username];
     },
-    wishlistItemCount: (state) => {
+    wishlistItemCount(state) {
       return state.wishlist.length;
     },
+    
+    wishlistItems(state) {
+      return state.wishlist;
+    },
+    
     reviewsForProduct: (state) => (productId) => {
       return state.reviews[productId] || [];
     },
