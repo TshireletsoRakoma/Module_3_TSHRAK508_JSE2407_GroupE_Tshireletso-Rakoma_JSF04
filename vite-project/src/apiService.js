@@ -10,7 +10,7 @@ const api = axios.create({
 
 export const fakeLogin = async (username, password) => {
   // Simulate authentication logic
-  if (username === 'Tshire' && password === '1234') {
+  if (username === 'mor_2314' && password === '83r5^_') {
     return { token: 'fake-jwt-token' }; // Simulated token
   }
   throw new Error('Invalid username or password');

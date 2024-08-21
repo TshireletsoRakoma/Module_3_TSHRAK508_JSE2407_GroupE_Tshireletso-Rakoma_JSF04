@@ -31,6 +31,10 @@
       <router-link to="/" class="go-back-button">
         Go Back
       </router-link>
+      <!-- Clear All Button -->
+      <button @click="clearAllItems" class="clear-all-button">
+        Clear All
+      </button>
       <!-- Checkout Button -->
       <button @click="checkout" class="checkout-button">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,6 +53,7 @@
   </main>
 </template>
 
+
 <script>
 import { mapGetters, mapActions } from 'vuex';
 
@@ -58,12 +63,15 @@ export default {
     ...mapGetters(['cartItemCount', 'cartTotalCost', 'cartContents']),
   },
   methods: {
-    ...mapActions(['removeFromCart']),
+    ...mapActions(['removeFromCart', 'clearCart']),
     getProductImage(item) {
       return item.productImage; // Returns the image URL of the product
     },
     removeItemFromCart(productId) {
       this.removeFromCart(productId);
+    },
+    clearAllItems() {
+      this.clearCart(); // Clear all items from the cart
     },
     checkout() {
       // Navigate to the Checkout page
@@ -150,6 +158,22 @@ export default {
 
 .go-back-button:hover {
   background-color: #0056b3;
+}
+
+.clear-all-button {
+  background-color: #ffc107;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.clear-all-button:hover {
+  background-color: #e0a800;
 }
 
 .checkout-button {
