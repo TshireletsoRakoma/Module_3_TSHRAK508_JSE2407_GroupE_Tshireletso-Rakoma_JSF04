@@ -1,4 +1,6 @@
 # Vuex Store for E-Commerce Application
+# 
+# YOUTUBE VIDEO [https://youtu.be/YCOSdR7M9Pc]
 
 This Vuex store is designed to manage the state of an e-commerce application, including user authentication, cart, wishlist, product reviews, ratings, comparison, and checkout functionalities.
 
@@ -99,3 +101,4 @@ Getters are used to retrieve computed properties from the state. They include:
 - `cartContents`: Get the contents of the cart.
 - `wishlistItemCount`: Get the number of items in the wishlist.
 - `wishlistItems`: Get
+
